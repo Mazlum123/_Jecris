@@ -1,3 +1,4 @@
+// apps/server/drizzle/0000_users.ts
 import { pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
 export const users = pgTable('users', {
@@ -8,7 +9,3 @@ export const users = pgTable('users', {
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
 });
-
-// Type d'inférence pour TypeScript
-export type User = typeof users.$inferSelect;
-export type NewUser = typeof users.$inferInsert;

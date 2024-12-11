@@ -15,10 +15,11 @@ async function main() {
   console.log('Migration started...');
   await migrate(db, { migrationsFolder: 'drizzle' });
   console.log('Migration completed!');
-  await pool.end();
+  process.exit(0);
 }
 
 main().catch((err) => {
+  console.error('Migration failed!');
   console.error(err);
   process.exit(1);
 });

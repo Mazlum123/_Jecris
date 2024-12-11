@@ -1,0 +1,33 @@
+@use '../base/variables' as *;
+@use '../base/mixins' as *;
+
+.toast {
+  position: fixed;
+  bottom: $spacing-lg;
+  right: $spacing-lg;
+  padding: $spacing-md $spacing-lg;
+  border-radius: $border-radius;
+  color: white;
+  @include box-shadow(2);
+  animation: slideIn 0.3s ease-out;
+  z-index: 1000;
+
+  &.success {
+    background-color: $secondary-color;
+  }
+
+  &.error {
+    background-color: $error-color;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
