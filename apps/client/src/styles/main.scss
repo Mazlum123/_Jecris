@@ -1,7 +1,7 @@
 @use 'base/variables' as *;
 @use 'base/mixins' as *;
-@use 'base/reset';
-
-@import 'components/header';
-@import 'components/book';
-@import 'components/cart';
+@use 'base/reset' as *;
+@use 'components/header' as *;
+@use 'components/book' as *;
+@use 'components/cart' as *;
+@use 'pages/add-book' as *;

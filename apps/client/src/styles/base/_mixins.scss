@@ -1,3 +1,6 @@
+@use 'variables' as *;
+
+// Flexbox
 @mixin flex($direction: row, $justify: center, $align: center) {
   display: flex;
   flex-direction: $direction;
@@ -5,8 +8,59 @@
   align-items: $align;
 }
 
-@mixin responsive($breakpoint) {
-  @media screen and (min-width: $breakpoint) {
+// Box shadow
+@mixin box-shadow($level: 1) {
+  @if $level == 1 {
+    box-shadow: $shadow-sm;
+  } @else if $level == 2 {
+    box-shadow: $shadow-md;
+  } @else if $level == 3 {
+    box-shadow: $shadow-lg;
+  }
+}
+
+// Responsive breakpoints
+@mixin mobile {
+  @media (max-width: $mobile) {
     @content;
+  }
+}
+
+@mixin tablet {
+  @media (min-width: #{$mobile + 1}) and (max-width: $tablet) {
+    @content;
+  }
+}
+
+@mixin desktop {
+  @media (min-width: #{$tablet + 1}) {
+    @content;
+  }
+}
+
+// Text truncate
+@mixin truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// Button styles
+@mixin button($bg-color: $primary-color, $text-color: white) {
+  background-color: $bg-color;
+  color: $text-color;
+  padding: $spacing-sm $spacing-md;
+  border-radius: $border-radius;
+  border: none;
+  cursor: pointer;
+  transition: $transition-base;
+  
+  &:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+  }
+  
+  &:active {
+    transform: translateY(0);
   }
 }

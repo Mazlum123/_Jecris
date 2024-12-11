@@ -11,10 +11,7 @@ export default defineConfig({
   css: {
     preprocessorOptions: {
       scss: {
-        additionalData: `
-          @import "./src/styles/base/variables";
-          @import "./src/styles/base/mixins";
-        `
+        includePaths: [path.resolve(__dirname, './src/styles')]
       }
     }
   },

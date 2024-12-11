@@ -1,3 +1,6 @@
+@use '../base/variables' as *;
+@use '../base/mixins' as *;
+
 .header {
   @include flex(row, space-between, center);
   padding: $spacing-md $spacing-lg;

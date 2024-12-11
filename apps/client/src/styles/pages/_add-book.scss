@@ -1,3 +1,6 @@
+@use '../base/variables' as *;
+@use '../base/mixins' as *;
+
 .add-book {
     max-width: 600px;
     margin: 2rem auto;
