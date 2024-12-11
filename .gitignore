@@ -61,3 +61,7 @@ debug.log
 .cache/
 .temp/
 .tmp/
+
+#Autres
+repo.txt
+dossier_structure.txt
