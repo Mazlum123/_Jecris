@@ -1,0 +1,96 @@
+.add-book {
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: $spacing-lg;
+    background-color: white;
+    border-radius: $border-radius-lg;
+    @include box-shadow(1);
+
+    h1 {
+      margin-bottom: $spacing-lg;
+      color: $text-color;
+      font-size: $font-size-xl;
+    }
+
+    .error-message {
+      padding: $spacing-md;
+      margin-bottom: $spacing-md;
+      background-color: lighten($error-color, 45%);
+      border: 1px solid $error-color;
+      border-radius: $border-radius;
+      color: $error-color;
+    }
+
+    .form-group {
+      margin-bottom: $spacing-md;
+
+      label {
+        display: block;
+        margin-bottom: $spacing-xs;
+        color: $text-color;
+        font-weight: 500;
+      }
+
+      input, textarea {
+        width: 100%;
+        padding: $spacing-sm;
+        border: 1px solid darken($background-color, 10%);
+        border-radius: $border-radius;
+        font-size: $font-size-base;
+        transition: $transition-base;
+
+        &:focus {
+          outline: none;
+          border-color: $primary-color;
+          box-shadow: 0 0 0 2px rgba($primary-color, 0.2);
+        }
+
+        &:disabled {
+          background-color: darken($background-color, 5%);
+          cursor: not-allowed;
+        }
+      }
+
+      textarea {
+        resize: vertical;
+        min-height: 100px;
+      }
+    }
+
+    .form-actions {
+      @include flex(row, flex-end, center);
+      gap: $spacing-md;
+      margin-top: $spacing-lg;
+
+      .button {
+        padding: $spacing-sm $spacing-lg;
+        border-radius: $border-radius;
+        font-weight: 500;
+        transition: $transition-base;
+        cursor: pointer;
+
+        &:disabled {
+          opacity: 0.7;
+          cursor: not-allowed;
+        }
+
+        &-primary {
+          background-color: $primary-color;
+          color: white;
+
+          &:hover:not(:disabled) {
+            background-color: darken($primary-color, 10%);
+          }
+        }
+
+        &-secondary {
+          background-color: $background-color;
+          color: $text-color;
+
+          &:hover:not(:disabled) {
+            background-color: darken($background-color, 10%);
+          }
+        }
+      }
+    }
+  }

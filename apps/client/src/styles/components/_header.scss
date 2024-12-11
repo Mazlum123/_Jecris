@@ -1,0 +1,6 @@
+.header {
+  @include flex(row, space-between, center);
+  padding: $spacing-md $spacing-lg;
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
