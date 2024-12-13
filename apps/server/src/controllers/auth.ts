@@ -1,37 +1,42 @@
-// apps/server/src/controllers/auth.ts
 import { Request, Response } from 'express';
 import argon2 from 'argon2';
 import jwt from 'jsonwebtoken';
 import { db } from '../db';
 import { users } from '../db/schema';
 import { eq } from 'drizzle-orm';
+import { sendResponse } from '../utils/responses';
+import { z } from 'zod';
 
-const { JWT_SECRET, REFRESH_TOKEN_SECRET } = process.env;
+// Validation schemas
+const registerSchema = z.object({
+  name: z.string().min(1, 'Name is required'),
+  email: z.string().email('Invalid email'),
+  password: z.string().min(6, 'Password must be at least 6 characters')
+});
+
+const loginSchema = z.object({
+  email: z.string().email('Invalid email'),
+  password: z.string().min(1, 'Password is required')
+});
 
 export const register = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { name, email, password } = req.body;
+    const validatedData = registerSchema.parse(req.body);
 
-    // Vérifier si l'utilisateur existe déjà
     const existingUser = await db.query.users.findFirst({
-      where: eq(users.email, email),
+      where: eq(users.email, validatedData.email),
     });
 
     if (existingUser) {
-      res.status(400).json({
-        success: false,
-        message: 'User already exists'
-      });
+      sendResponse(res, null, 'Email already in use', 409);
       return;
     }
 
-    // Hasher le mot de passe
-    const hashedPassword = await argon2.hash(password);
+    const hashedPassword = await argon2.hash(validatedData.password);
 
-    // Créer l'utilisateur
     const [newUser] = await db.insert(users).values({
-      name,
-      email,
+      name: validatedData.name,
+      email: validatedData.email,
       password: hashedPassword,
     }).returning({
       id: users.id,
@@ -39,163 +44,144 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       email: users.email,
     });
 
-    // Générer les tokens
     const token = jwt.sign(
       { userId: newUser.id },
-      JWT_SECRET!,
+      process.env.JWT_SECRET!,
       { expiresIn: '15m' }
     );
 
-    const refreshToken = jwt.sign(
-      { userId: newUser.id },
-      REFRESH_TOKEN_SECRET!,
-      { expiresIn: '7d' }
-    );
-
-    // Envoyer les tokens dans des cookies
     res.cookie('token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 15 * 60 * 1000, // 15 minutes
+      sameSite: 'lax',
+      maxAge: 15 * 60 * 1000,
     });
 
-    res.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 jours
-    });
-
-    res.status(201).json({
-      success: true,
-      message: 'User registered successfully',
-      data: newUser
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Internal server error'
-    });
+    sendResponse(res, { ...newUser, token }, 'Registration successful', 201);
+  } catch (error: unknown) {
+    if (error instanceof z.ZodError) {
+      sendResponse(res, null, error.errors[0].message, 400);
+      return;
+    }
+    console.error('Registration error:', error);
+    sendResponse(res, null, 'Internal server error', 500);
   }
 };
 
 export const login = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { email, password } = req.body;
+    const validatedData = loginSchema.parse(req.body);
 
-    // Trouver l'utilisateur
-    const foundUser = await db.query.users.findFirst({
-      where: eq(users.email, email),
+    const user = await db.query.users.findFirst({
+      where: eq(users.email, validatedData.email),
     });
 
-    if (!foundUser) {
-      res.status(401).json({
-        success: false,
-        message: 'Invalid credentials'
-      });
+    if (!user) {
+      sendResponse(res, null, 'Invalid credentials', 401);
       return;
     }
 
-    // Vérifier le mot de passe
-    const validPassword = await argon2.verify(foundUser.password, password);
+    const validPassword = await argon2.verify(user.password, validatedData.password);
     if (!validPassword) {
-      res.status(401).json({
-        success: false,
-        message: 'Invalid credentials'
-      });
+      sendResponse(res, null, 'Invalid credentials', 401);
       return;
     }
 
-    // Générer les tokens
     const token = jwt.sign(
-      { userId: foundUser.id },
-      JWT_SECRET!,
+      { userId: user.id },
+      process.env.JWT_SECRET!,
       { expiresIn: '15m' }
     );
 
-    const refreshToken = jwt.sign(
-      { userId: foundUser.id },
-      REFRESH_TOKEN_SECRET!,
-      { expiresIn: '7d' }
-    );
     res.cookie('token', token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
-        maxAge: 15 * 60 * 1000, // 15 minutes
-      });
-  
-      res.cookie('refreshToken', refreshToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 jours
-      });
-  
-      res.status(200).json({
-        success: true,
-        message: 'Logged in successfully',
-        data: {
-          id: foundUser.id,
-          name: foundUser.name,
-          email: foundUser.email
-        }
-      });
-    } catch (error) {
-      res.status(500).json({
-        success: false,
-        message: 'Internal server error'
-      });
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 15 * 60 * 1000,
+    });
+
+    const userData = {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      token
+    };
+
+    sendResponse(res, userData, 'Login successful', 200);
+  } catch (error: unknown) {
+    if (error instanceof z.ZodError) {
+      sendResponse(res, null, error.errors[0].message, 400);
+      return;
     }
-  };
-  
-  export const logout = async (_req: Request, res: Response): Promise<void> => {
-    try {
-      res.clearCookie('token');
-      res.clearCookie('refreshToken');
-      
-      res.status(200).json({
-        success: true,
-        message: 'Logged out successfully'
-      });
-    } catch (error) {
-      res.status(500).json({
-        success: false,
-        message: 'Internal server error'
-      });
-    }
-  };
-  
-  export const me = async (req: Request, res: Response): Promise<void> => {
-    try {
-      const userId = res.locals.user.userId;
-      
-      const foundUser = await db.query.users.findFirst({
-        where: eq(users.id, userId),
-        columns: {
-          id: true,
-          name: true,
-          email: true,
-        }
-      });
-  
-      if (!foundUser) {
-        res.status(404).json({
-          success: false,
-          message: 'User not found'
-        });
-        return;
+    console.error('Login error:', error);
+    sendResponse(res, null, 'Internal server error', 500);
+  }
+};
+
+export const logout = async (_req: Request, res: Response): Promise<void> => {
+  try {
+    res.clearCookie('token', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax'
+    });
+
+    sendResponse(res, null, 'Logout successful', 200);
+  } catch (error: unknown) {
+    console.error('Logout error:', error);
+    sendResponse(res, null, 'Internal server error', 500);
+  }
+};
+
+export const me = async (req: Request, res: Response): Promise<void> => {
+  try {
+    console.log('Me route - user from token:', res.locals.user);
+    const userId = res.locals.user.userId;
+    console.log('Looking for user with ID:', userId);
+
+    const user = await db.query.users.findFirst({
+      where: eq(users.id, userId),
+      columns: {
+        id: true,
+        name: true,
+        email: true,
       }
-  
-      res.status(200).json({
-        success: true,
-        data: foundUser
-      });
-    } catch (error) {
-      res.status(500).json({
-        success: false,
-        message: 'Internal server error'
-      });
+    });
+    console.log('Found user:', user);
+
+    if (!user) {
+      sendResponse(res, null, 'User not found', 404);
+      return;
     }
-  };
+
+    sendResponse(res, user, 'User data retrieved successfully', 200);
+  } catch (error: unknown) {
+    console.error('Get user error:', error);
+    sendResponse(res, null, 'Internal server error', 500);
+  }
+};
+
+// Optionnel : Rafraîchissement du token
+export const refreshToken = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const userId = res.locals.user.userId;
+
+    const newToken = jwt.sign(
+      { userId },
+      process.env.JWT_SECRET!,
+      { expiresIn: '15m' }
+    );
+
+    res.cookie('token', newToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 15 * 60 * 1000,
+    });
+
+    sendResponse(res, { token: newToken }, 'Token refreshed successfully', 200);
+  } catch (error: unknown) {
+    console.error('Token refresh error:', error);
+    sendResponse(res, null, 'Internal server error', 500);
+  }
+};
