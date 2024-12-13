@@ -1,12 +1,12 @@
 import { Router } from 'express';
 import authRoutes from './auth';
 import bookRoutes from './books';
-// import cartRoutes from './cart'; // A ajouter plus tar
+import cartRoutes from './cart';
 
 const router = Router();
 
 router.use('/auth', authRoutes);
 router.use('/books', bookRoutes);
-// router.use('/cart', cartRoutes); // À implémenter plus tard
+router.use('/cart', cartRoutes);
 
 export default router;

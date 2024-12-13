@@ -189,3 +189,45 @@ try {
   sendResponse(res, null, 'Failed to clear cart', 500);
 }
 };
+
+export const getCartTotal = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const userId = res.locals.user.userId;
+
+    const cart = await db.query.carts.findFirst({
+      where: eq(carts.userId, userId),
+      with: {
+        items: {
+          with: {
+            book: true
+          }
+        }
+      }
+    });
+
+    if (!cart) {
+      sendResponse(res, { total: 0 }, 'Cart is empty', 200);
+      return;
+    }
+
+    const total = cart.items.reduce((sum, item) => {
+      const price = parseFloat(item.book?.price || '0');
+      return sum + (price * item.quantity);
+    }, 0);
+
+    sendResponse(res, { 
+      total,
+      itemCount: cart.items.length,
+      items: cart.items.map(item => ({
+        id: item.id,
+        title: item.book?.title,
+        price: item.book?.price,
+        quantity: item.quantity,
+        subtotal: parseFloat(item.book?.price || '0') * item.quantity
+      }))
+    }, 'Cart total calculated successfully', 200);
+  } catch (error) {
+    console.error('Get cart total error:', error);
+    sendResponse(res, null, 'Failed to calculate cart total', 500);
+  }
+};

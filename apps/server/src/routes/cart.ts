@@ -4,7 +4,8 @@ import {
   addToCart, 
   removeFromCart, 
   updateCartItemQuantity, 
-  clearCart 
+  clearCart,
+  getCartTotal
 } from '../controllers/cart';
 import { authMiddleware } from '../middlewares/auth';
 
@@ -18,5 +19,6 @@ router.post('/add', addToCart);
 router.delete('/items/:itemId', removeFromCart);
 router.put('/items/:itemId', updateCartItemQuantity);
 router.delete('/clear', clearCart);
+router.get('/total', authMiddleware, getCartTotal);
 
 export default router;

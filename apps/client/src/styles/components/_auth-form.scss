@@ -1,19 +1,23 @@
 @use '../base/variables' as *;
 @use '../base/mixins' as *;
 
+$auth-primary: #D4D0C1;
+$auth-secondary: #BCBFD0;
+$auth-dark: #1E2A3B;
+
 .login-form,
 .register-form {
   max-width: 400px;
   margin: 2rem auto;
   padding: $spacing-lg;
-  background-color: white;
+  background-color: $auth-primary;
   border-radius: $border-radius-lg;
   @include box-shadow(1);
 
   h2 {
     text-align: center;
     margin-bottom: $spacing-lg;
-    color: $text-color;
+    color: $auth-dark;
     font-size: $font-size-xl;
     font-weight: 600;
   }
@@ -25,7 +29,7 @@
     label {
       display: block;
       margin-bottom: $spacing-xs;
-      color: $text-color;
+      color: $auth-dark;
       font-weight: 500;
       font-size: $font-size-sm;
     }
@@ -33,24 +37,24 @@
     input {
       width: 100%;
       padding: $spacing-sm;
-      border: 1px solid lighten($text-color, 50%);
+      border: 1px solid $auth-secondary;
       border-radius: $border-radius;
       font-size: $font-size-base;
       transition: $transition-base;
 
       &:focus {
         outline: none;
-        border-color: $primary-color;
-        box-shadow: 0 0 0 2px rgba($primary-color, 0.2);
+        border-color: $auth-dark;
+        box-shadow: 0 0 0 2px rgba($auth-dark, 0.2);
       }
 
       &:disabled {
-        background-color: lighten($text-color, 75%);
+        background-color: $auth-secondary;
         cursor: not-allowed;
       }
 
       &::placeholder {
-        color: lighten($text-color, 40%);
+        color: lighten($auth-dark, 40%);
       }
     }
 
@@ -59,7 +63,7 @@
       right: 0;
       top: 0;
       font-size: $font-size-sm;
-      color: $primary-color;
+      color: $auth-dark;
       text-decoration: none;
       transition: $transition-base;
 
@@ -70,7 +74,7 @@
   }
 
   .submit-button {
-    @include button($primary-color);
+    @include button($auth-dark);
     width: 100%;
     padding: $spacing-sm;
     margin-top: $spacing-md;
@@ -82,7 +86,7 @@
     }
 
     &:disabled {
-      background-color: lighten($primary-color, 20%);
+      background-color: $auth-secondary;
       cursor: not-allowed;
     }
   }
@@ -91,12 +95,12 @@
     margin-top: $spacing-lg;
     text-align: center;
     font-size: $font-size-sm;
-    color: lighten($text-color, 20%);
+    color: $auth-dark;
 
     .switch-form-button {
       background: none;
       border: none;
-      color: $primary-color;
+      color: $auth-dark;
       font-size: $font-size-sm;
       cursor: pointer;
       padding: 0;
@@ -105,7 +109,7 @@
       transition: $transition-base;
 
       &:hover {
-        color: darken($primary-color, 10%);
+        color: $auth-secondary;
       }
     }
   }
@@ -117,174 +121,6 @@
   }
 }
 
-// Styles spécifiques au formulaire d'inscription
-.register-form {
-  .password-requirements {
-    font-size: $font-size-xs;
-    color: lighten($text-color, 30%);
-    margin-top: $spacing-xs;
-
-    ul {
-      list-style: none;
-      padding-left: $spacing-sm;
-
-      li {
-        margin-bottom: $spacing-xs;
-
-        &::before {
-            content: "•";
-            color: $primary-color;
-            display: inline-block;
-            width: 1em;
-            margin-left: -1em;
-          }
-
-          &.valid {
-            color: $secondary-color;
-
-            &::before {
-              content: "✓";
-              color: $secondary-color;
-            }
-          }
-        }
-      }
-    }
-
-    .terms-checkbox {
-      display: flex;
-      align-items: center;
-      margin-top: $spacing-md;
-
-      input[type="checkbox"] {
-        width: auto;
-        margin-right: $spacing-xs;
-      }
-
-      label {
-        font-size: $font-size-sm;
-        color: $text-color;
-        margin: 0;
-
-        a {
-          color: $primary-color;
-          text-decoration: none;
-
-          &:hover {
-            text-decoration: underline;
-          }
-        }
-      }
-    }
-  }
-
-  // Animation pour les formulaires
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(-10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  .login-form,
-  .register-form {
-    animation: fadeIn 0.3s ease-out;
-  }
-
-  // Responsive design
-  @include mobile {
-    .login-form,
-    .register-form {
-      margin: $spacing-md;
-      padding: $spacing-md;
-
-      h2 {
-        font-size: $font-size-lg;
-      }
-
-      .form-group {
-        margin-bottom: $spacing-md;
-
-        input {
-          padding: $spacing-xs $spacing-sm;
-        }
-      }
-
-      .submit-button {
-        padding: $spacing-xs $spacing-sm;
-      }
-
-      .form-footer {
-        margin-top: $spacing-md;
-      }
-    }
-  }
-
-  // Dark mode support
-  @media (prefers-color-scheme: dark) {
-    .login-form,
-    .register-form {
-      background-color: lighten($text-color, 5%);
-
-      h2 {
-        color: white;
-      }
-
-      .form-group {
-        label {
-          color: white;
-        }
-
-        input {
-          background-color: lighten($text-color, 10%);
-          border-color: lighten($text-color, 20%);
-          color: white;
-
-          &::placeholder {
-            color: lighten($text-color, 40%);
-          }
-
-          &:focus {
-            border-color: $primary-color;
-            box-shadow: 0 0 0 2px rgba($primary-color, 0.4);
-          }
-        }
-      }
-
-      .form-footer {
-        color: lighten($text-color, 40%);
-      }
-
-      .error-message {
-        color: lighten($error-color, 10%);
-      }
-    }
-  }
-
-  // Loading spinner pour le bouton submit
-  .submit-button {
-    position: relative;
-
-    &.loading {
-      &::after {
-        content: '';
-        position: absolute;
-        width: 20px;
-        height: 20px;
-        top: 50%;
-        right: $spacing-md;
-        transform: translateY(-50%);
-        border: 2px solid white;
-        border-radius: 50%;
-        border-top-color: transparent;
-        animation: spin 1s linear infinite;
-      }
-    }
-  }
 
   @keyframes spin {
     to {

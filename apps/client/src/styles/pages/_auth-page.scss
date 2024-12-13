@@ -10,7 +10,7 @@
   .auth-container {
     width: 100%;
     max-width: 450px;
-    background-color: white;
+    background-color: $secondary-color;
     border-radius: $border-radius-lg;
     @include box-shadow(2);
     overflow: hidden;
@@ -33,8 +33,8 @@
       transition: $transition-base;
 
       &.active {
-        background-color: white;
-        color: $primary-color;
+        background-color: $secondary-color;
+        color: black;
         border-radius: $border-radius;
         @include box-shadow(1);
       }
