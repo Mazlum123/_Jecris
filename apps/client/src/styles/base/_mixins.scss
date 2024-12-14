@@ -54,12 +54,12 @@
   border: none;
   cursor: pointer;
   transition: $transition-base;
-  
+
   &:hover {
     opacity: 0.9;
     transform: translateY(-1px);
   }
-  
+
   &:active {
     transform: translateY(0);
   }

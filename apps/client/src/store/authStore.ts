@@ -1,78 +1,76 @@
 import { create } from 'zustand';
-import { AuthState } from '../types/auth';
-import { authService } from '../services/auth.service';
+import { persist } from 'zustand/middleware';
+import { User } from '../types/auth';
+import { login as loginApi, register as registerApi } from '../services/auth.service';
 
-export const useAuthStore = create<AuthState>((set) => ({
-  user: null,
-  token: localStorage.getItem('token'),
-  isAuthenticated: false,
+interface AuthState {
+  user: User | null;
+  token: string | null;
+  isAuthenticated: boolean;
+  login: (email: string, password: string) => Promise<void>;
+  register: (name: string, email: string, password: string) => Promise<void>;
+  logout: () => void;
+  checkAuth: () => Promise<void>;
+}
 
-  login: async (email: string, password: string) => {
-    try {
-      const response = await authService.login(email, password);
-      const { user, token } = response.data;
+export const useAuthStore = create<AuthState>()(
+  persist(
+    (set) => ({
+      user: null,
+      token: null,
+      isAuthenticated: false,
 
-      localStorage.setItem('token', token);
+      login: async (email: string, password: string) => {
+        try {
+          const response = await loginApi(email, password);
+          set({
+            user: response.data.user,
+            token: response.data.token,
+            isAuthenticated: true
+          });
+        } catch (error) {
+          throw error;
+        }
+      },
 
-      set({
-        user,
-        token,
-        isAuthenticated: true,
-      });
-    } catch (error) {
-      console.error('Login error:', error);
-      throw error;
-    }
-  },
+      register: async (name: string, email: string, password: string) => {
+        try {
+          const response = await registerApi(name, email, password);
+          set({
+            user: response.data.user,
+            token: response.data.token,
+            isAuthenticated: true
+          });
+        } catch (error) {
+          throw error;
+        }
+      },
 
-  register: async (name: string, email: string, password: string) => {
-    try {
-      const response = await authService.register(name, email, password);
-      const { user, token } = response.data;
-
-      localStorage.setItem('token', token);
-
-      set({
-        user,
-        token,
-        isAuthenticated: true,
-      });
-    } catch (error) {
-      console.error('Registration error:', error);
-      throw error;
-    }
-  },
-
-  logout: async () => {
-    try {
-      await authService.logout();
-      set({
-        user: null,
-        token: null,
-        isAuthenticated: false,
-      });
-    } catch (error) {
-      console.error('Logout error:', error);
-      throw error;
-    }
-  },
-
-  // Fonction pour vérifier l'état de l'authentification au chargement de l'app
-  checkAuth: async () => {
-    try {
-      const user = await authService.getCurrentUser();
-      if (user) {
+      logout: () => {
         set({
-          user,
-          isAuthenticated: true,
+          user: null,
+          token: null,
+          isAuthenticated: false
         });
-      }
-    } catch (error) {
-      set({
-        user: null,
-        token: null,
-        isAuthenticated: false,
-      });
+      },
+
+      checkAuth: async () => {
+        try {
+          const token = localStorage.getItem('auth-storage');
+          if (!token) {
+            set({ user: null, token: null, isAuthenticated: false });
+            return;
+          }
+          // Ici vous pouvez ajouter une vérification du token avec le backend
+          // Pour l'instant, nous supposons que le token est valide
+          set({ isAuthenticated: true });
+        } catch (error) {
+          set({ user: null, token: null, isAuthenticated: false });
+        }
+      },
+    }),
+    {
+      name: 'auth-storage',
     }
-  },
-}));
+  )
+);

@@ -1,21 +1,37 @@
-import { createBrowserRouter } from 'react-router-dom';
-import Layout from '@components/Layout/Layout';
-import Home from '@pages/Home';
-import AddBook from '@pages/AddBook';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { AuthPage } from '../pages/AuthPage';
+import { Dashboard } from '../pages/Dashboard';
+import Home from '../pages/Home';
+import PrivateRoute from '../components/PrivateRoute/PrivateRoute';
 
-export const router = createBrowserRouter([
+const router = createBrowserRouter([
   {
     path: '/',
-    element: <Layout />,
+    element: <Home />,
+  },
+  {
+    path: '/auth/*',
     children: [
       {
-        index: true,
-        element: <Home />
+        path: 'login',
+        element: <AuthPage />,
       },
       {
-        path: 'add-book',
-        element: <AddBook />
-      }
-    ]
-  }
+        path: 'register',
+        element: <AuthPage />,
+      },
+    ],
+  },
+  {
+    path: '/dashboard',
+    element: (
+      <PrivateRoute>
+        <Dashboard />
+      </PrivateRoute>
+    ),
+  },
 ]);
+
+export const AppRouter = () => {
+  return <RouterProvider router={router} />;
+};

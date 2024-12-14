@@ -1,46 +1,62 @@
 import { api } from './api';
-import { User } from '../types/auth';
+import { AuthResponse } from '../types/auth';
 
-interface LoginResponse {
-  user: User;
-  token: string;
-}
-
-interface AuthResponse {
-  success: boolean;
-  data: LoginResponse;
-  message: string;
-}
-
-export const authService = {
-  async login(email: string, password: string): Promise<AuthResponse> {
-    const response = await api.post<AuthResponse>('/auth/login', {
-      email,
-      password,
-    });
+export const login = async (email: string, password: string): Promise<AuthResponse> => {
+  try {
+    const response = await api.post<AuthResponse>('/auth/login', { email, password });
+    const { token } = response.data.data;
+    if (token) {
+      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    }
     return response.data;
-  },
+  } catch (error) {
+    throw handleAuthError(error);
+  }
+};
 
-  async register(name: string, email: string, password: string): Promise<AuthResponse> {
+export const register = async (
+  name: string,
+  email: string,
+  password: string
+): Promise<AuthResponse> => {
+  try {
     const response = await api.post<AuthResponse>('/auth/register', {
       name,
       email,
       password,
     });
-    return response.data;
-  },
-
-  async logout(): Promise<void> {
-    await api.post('/auth/logout');
-    localStorage.removeItem('token');
-  },
-
-  async getCurrentUser(): Promise<User | null> {
-    try {
-      const response = await api.get<AuthResponse>('/auth/me');
-      return response.data.data.user;
-    } catch {
-      return null;
+    const { token } = response.data.data;
+    if (token) {
+      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     }
-  },
+    return response.data;
+  } catch (error) {
+    throw handleAuthError(error);
+  }
+};
+
+export const logout = async (): Promise<void> => {
+  try {
+    await api.post('/auth/logout');
+    delete api.defaults.headers.common['Authorization'];
+  } catch (error) {
+    console.error('Logout error:', error);
+  }
+};
+
+export const checkAuth = async (): Promise<AuthResponse> => {
+  try {
+    const response = await api.get<AuthResponse>('/auth/me');
+    return response.data;
+  } catch (error) {
+    throw handleAuthError(error);
+  }
+};
+
+const handleAuthError = (error: any): Error => {
+  if (error.response) {
+    const message = error.response.data.message || 'Authentication failed';
+    return new Error(message);
+  }
+  return new Error('Network error');
 };

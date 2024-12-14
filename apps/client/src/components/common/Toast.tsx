@@ -1,23 +1,14 @@
-import { useEffect } from 'react';
-
 interface ToastProps {
   message: string;
-  type: 'success' | 'error';
+  type: 'success' | 'error' | 'info';
   onClose: () => void;
 }
 
 export const Toast = ({ message, type, onClose }: ToastProps) => {
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      onClose();
-    }, 3000);
-
-    return () => clearTimeout(timer);
-  }, [onClose]);
-
   return (
     <div className={`toast ${type}`}>
-      {message}
+      <p>{message}</p>
+      <button onClick={onClose}>&times;</button>
     </div>
   );
 };
