@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import Logo from '..\..\assets\logo.png';
+import Logo from '../../assets/logo.png';
 
 interface AuthLayoutProps {
   children: ReactNode;

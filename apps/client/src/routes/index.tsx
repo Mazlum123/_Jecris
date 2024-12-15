@@ -1,35 +1,43 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import Home from '../pages/Home';
 import { AuthPage } from '../pages/AuthPage';
 import { Dashboard } from '../pages/Dashboard';
-import Home from '../pages/Home';
-import PrivateRoute from '../components/PrivateRoute/PrivateRoute';
+import Layout from '../components/Layout/Layout';
+import { CheckoutSuccess } from '../pages/CheckoutSuccess';
+import { Library } from '../pages/Library';
+import PrivateRoute from '@/components/PrivateRoute/PrivateRoute';
 
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <Home />,
-  },
-  {
-    path: '/auth/*',
+    element: <Layout />,
     children: [
       {
-        path: 'login',
-        element: <AuthPage />,
+        index: true,
+        element: <Home />
       },
       {
-        path: 'register',
-        element: <AuthPage />,
+        path: 'auth/*',
+        element: <AuthPage />
       },
-    ],
-  },
-  {
-    path: '/dashboard',
-    element: (
-      <PrivateRoute>
-        <Dashboard />
-      </PrivateRoute>
-    ),
-  },
+      {
+        path: 'dashboard',
+        element: <Dashboard />
+      },
+      {
+        path: 'checkout/success',
+        element: <CheckoutSuccess />
+      },
+      {
+        path: 'library',
+        element: (
+          <PrivateRoute>
+            <Library />
+          </PrivateRoute>
+        )
+      }
+    ]
+  }
 ]);
 
 export const AppRouter = () => {

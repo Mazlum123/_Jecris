@@ -1,14 +1,30 @@
-interface ToastProps {
-  message: string;
-  type: 'success' | 'error' | 'info';
-  onClose: () => void;
-}
+import React from 'react';
+import { useNotificationStore } from '../../store/useNotificationStore';
 
-export const Toast = ({ message, type, onClose }: ToastProps) => {
+export const ToastContainer = () => {
+  const notifications = useNotificationStore((state) => state.notifications);
+  const removeNotification = useNotificationStore((state) => state.removeNotification);
+
   return (
-    <div className={`toast ${type}`}>
-      <p>{message}</p>
-      <button onClick={onClose}>&times;</button>
+    <div className="toast-container">
+      {notifications.map((notification) => (
+        <div
+          key={notification.id}
+          className={`toast toast--${notification.type}`}
+          onClick={() => removeNotification(notification.id)}
+        >
+          <p>{notification.message}</p>
+          <button 
+            className="toast__close"
+            onClick={(e) => {
+              e.stopPropagation();
+              removeNotification(notification.id);
+            }}
+          >
+            ×
+          </button>
+        </div>
+      ))}
     </div>
   );
 };

@@ -1,39 +1,121 @@
+import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useCartStore } from '../../store/useCartStore';
+import { useNotificationStore } from '../../store/useNotificationStore';
+import { CartItem } from './CartItem';
+import { initiateCheckout } from '../../services/stripe.service';
 
-export default function Cart() {
-  const { items, total, removeItem, updateQuantity } = useCartStore();
+interface CartProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
+  const navigate = useNavigate();
+  const { items, total, clearCart, updateQuantity, removeItem } = useCartStore();
+  const addNotification = useNotificationStore(state => state.addNotification);
+
+  // Empêcher le scroll quand le panier est ouvert
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+
+  const handleRemoveItem = (id: string, title: string) => {
+    removeItem(id);
+    addNotification(`${title} retiré du panier`, 'info');
+  };
+
+  const handleUpdateQuantity = (id: string, quantity: number, title: string) => {
+    updateQuantity(id, quantity);
+    addNotification(`Quantité mise à jour`, 'info');
+  };
+
+  const handleClearCart = () => {
+    clearCart();
+    addNotification('Panier vidé', 'info');
+    onClose();
+  };
+
+  const handleCheckout = async () => {
+    try {
+      addNotification('Redirection vers le paiement...', 'info');
+      await initiateCheckout(items);
+    } catch (error) {
+      addNotification('Erreur lors du paiement', 'error');
+      console.error('Checkout error:', error);
+    }
+  };
 
   return (
-    <div className="cart">
-      <h2>Panier ({items.length})</h2>
-      {items.map(item => (
-        <div key={item.id} className="cart-item">
-          <div className="cart-item__info">
-            <h3>{item.title}</h3>
-            <p>{item.price}€</p>
-          </div>
-          <div className="cart-item__actions">
-            <button 
-              onClick={() => updateQuantity(item.id, item.quantity - 1)}
-              disabled={item.quantity <= 1}
-            >
-              -
-            </button>
-            <span>{item.quantity}</span>
-            <button 
-              onClick={() => updateQuantity(item.id, item.quantity + 1)}
-            >
-              +
-            </button>
-            <button onClick={() => removeItem(item.id)}>
-              Supprimer
-            </button>
-          </div>
+    <>
+      {/* Overlay */}
+      <div
+        className={`cart-overlay ${isOpen ? 'visible' : ''}`} 
+        onClick={onClose}
+      />
+
+      {/* Cart */}
+      <div className={`cart ${isOpen ? 'open' : ''}`}>
+        <div className="cart__header">
+          <h2>Panier ({items.length})</h2>
+          <button
+            className="cart__close"
+            onClick={onClose}
+            aria-label="Fermer le panier"
+          >
+            ×
+          </button>
         </div>
-      ))}
-      <div className="cart-total">
-        Total: {total.toFixed(2)}€
-      </div>
+
+        {items.length === 0 ? (
+          <div className="cart--empty">
+            <p>Votre panier est vide</p>
+          </div>
+        ) : (
+          <>
+            <div className="cart__items">
+              {items.map((item) => (
+                <CartItem
+                key={item.id}
+                {...item}
+                onUpdateQuantity={(quantity) =>
+                  handleUpdateQuantity(item.id, quantity, item.title)
+                }
+                onRemove={() => handleRemoveItem(item.id, item.title)}
+              />
+            ))}
+          </div>
+
+          <div className="cart__footer">
+            <div className="cart__total">
+              Total: {total.toFixed(2)}€
+            </div>
+            <button 
+              className="cart__clear"
+              onClick={handleClearCart}
+            >
+              Vider le panier
+            </button>
+            <button 
+              className="cart__checkout"
+              onClick={handleCheckout}
+              disabled={items.length === 0}
+            >
+              Procéder au paiement
+            </button>
+          </div>
+        </>
+      )}
     </div>
-  );
-}
+  </>
+);
+};
+
+export default Cart;

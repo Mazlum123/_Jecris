@@ -38,6 +38,14 @@ export const cartItems = pgTable('cart_items', {
   updatedAt: timestamp('updated_at').defaultNow(),
 });
 
+export const purchases = pgTable('purchases', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: uuid('user_id').references(() => users.id),
+  bookId: uuid('book_id').references(() => books.id),
+  pdfUrl: text('pdf_url').notNull(),
+  purchaseDate: timestamp('purchase_date').defaultNow(),
+});
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   books: many(books),

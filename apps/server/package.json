@@ -11,6 +11,7 @@
     "reset-db": "tsx src/db/reset.ts"
   },
   "dependencies": {
+    "@types/pdfkit": "^0.13.7",
     "argon2": "^0.41.1",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
@@ -18,7 +19,9 @@
     "drizzle-orm": "^0.38.0",
     "express": "^4.21.2",
     "jsonwebtoken": "^9.0.2",
+    "pdfkit": "^0.15.2",
     "pg": "^8.13.1",
+    "stripe": "^17.4.0",
     "zod": "^3.24.1"
   },
   "devDependencies": {

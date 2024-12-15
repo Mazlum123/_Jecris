@@ -1,5 +1,6 @@
 @use '../base/variables' as *;
 @use '../base/mixins' as *;
+@use "sass:color";
 
 $auth-primary: #D4D0C1;
 $auth-secondary: #BCBFD0;
@@ -54,7 +55,7 @@ $auth-dark: #1E2A3B;
       }
 
       &::placeholder {
-        color: lighten($auth-dark, 40%);
+        color: color.adjust($auth-dark, $lightness: 40%);
       }
     }
 

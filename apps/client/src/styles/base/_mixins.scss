@@ -38,6 +38,28 @@
   }
 }
 
+@mixin widescreen {
+  @media (min-width: #{$desktop + 1}) {
+    @content;
+  }
+}
+
+// Mixin pour gérer plusieurs breakpoints
+@mixin responsive($breakpoint) {
+  @if $breakpoint == mobile {
+    @media (max-width: $mobile) { @content; }
+  }
+  @else if $breakpoint == tablet {
+    @media (min-width: #{$mobile + 1}) and (max-width: $tablet) { @content; }
+  }
+  @else if $breakpoint == desktop {
+    @media (min-width: #{$tablet + 1}) { @content; }
+  }
+  @else if $breakpoint == widescreen {
+    @media (min-width: #{$desktop + 1}) { @content; }
+  }
+}
+
 // Text truncate
 @mixin truncate {
   overflow: hidden;
@@ -46,21 +68,23 @@
 }
 
 // Button styles
-@mixin button($bg-color: $primary-color, $text-color: white) {
+@mixin button($bg-color) {
   background-color: $bg-color;
-  color: $text-color;
+  color: white;
+  border: none;
   padding: $spacing-sm $spacing-md;
   border-radius: $border-radius;
-  border: none;
   cursor: pointer;
+  font-size: $font-size-base;
+  font-weight: 500;
   transition: $transition-base;
 
   &:hover {
     opacity: 0.9;
-    transform: translateY(-1px);
   }
 
-  &:active {
-    transform: translateY(0);
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 }

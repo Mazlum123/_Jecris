@@ -1,8 +1,11 @@
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useCartStore } from '../../store/useCartStore';
+import { Cart } from '../Cart/Cart';
 
-export default function Header() {
-  const itemCount = useCartStore((state) => state.items.length);
+export const Header = () => {
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const itemCount = useCartStore(state => state.items.length);
 
   return (
     <header className="header">
@@ -12,10 +15,19 @@ export default function Header() {
       <nav>
         <ul>
           <li><Link to="/">Accueil</Link></li>
+          <li><Link to="/library">Ma bibliothèque</Link></li>
           <li><Link to="/add-book">Ajouter un livre</Link></li>
-          <li className="cart-count">Panier ({itemCount})</li>
+          <li>
+            <button 
+              className="cart-button"
+              onClick={() => setIsCartOpen(!isCartOpen)}
+            >
+              Panier ({itemCount})
+            </button>
+          </li>
         </ul>
       </nav>
+      <Cart isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
     </header>
   );
-}
+};

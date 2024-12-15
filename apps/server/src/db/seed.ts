@@ -3,34 +3,29 @@ import { books } from './schema';
 
 async function seed() {
   try {
-    // Insérer quelques livres de test
-    await db.insert(products).values([
+    await db.insert(books).values([
       {
-        title: "L'Art de la Fiction",
-        description: "Un guide complet pour les écrivains en herbe, couvrant tous les aspects de l'écriture créative.",
+        title: "L'Art d'Écrire",
+        description: "Guide complet pour les écrivains en herbe",
         price: "29.99",
-        imageUrl: "https://example.com/art-fiction.jpg",
-        stock: 50,
-        authorId: "ID_DE_VOTRE_UTILISATEUR_TEST" // Remplacez par un ID valide
+        imageUrl: "https://picsum.photos/200/300",
+        stock: 10
       },
       {
-        title: "Le Guide du Développeur Full Stack",
-        description: "Tout ce que vous devez savoir pour devenir un développeur full stack compétent.",
-        price: "39.99",
-        imageUrl: "https://example.com/dev-guide.jpg",
-        stock: 30,
-        authorId: "ID_DE_VOTRE_UTILISATEUR_TEST"
+        title: "Le Guide du Style",
+        description: "Perfectionnez votre écriture",
+        price: "24.99",
+        imageUrl: "https://picsum.photos/200/300",
+        stock: 15
       },
       {
-        title: "JavaScript: Les Bonnes Pratiques",
-        description: "Un livre essentiel pour maîtriser les meilleures pratiques en JavaScript.",
-        price: "34.99",
-        imageUrl: "https://example.com/js-best-practices.jpg",
-        stock: 25,
-        authorId: "ID_DE_VOTRE_UTILISATEUR_TEST"
+        title: "Écriture Créative",
+        description: "Techniques et exercices pratiques",
+        price: "19.99",
+        imageUrl: "https://picsum.photos/200/300",
+        stock: 20
       }
     ]);
-
     console.log('Seed data inserted successfully');
   } catch (error) {
     console.error('Error seeding data:', error);

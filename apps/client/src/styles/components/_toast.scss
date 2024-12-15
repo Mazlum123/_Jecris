@@ -1,33 +1,88 @@
 @use '../base/variables' as *;
 @use '../base/mixins' as *;
 
-.toast {
+.toast-container {
   position: fixed;
-  bottom: $spacing-lg;
+  top: $spacing-lg;
   right: $spacing-lg;
-  padding: $spacing-md $spacing-lg;
-  border-radius: $border-radius;
-  color: white;
-  @include box-shadow(2);
-  animation: slideIn 0.3s ease-out;
-  z-index: 1000;
-
-  &.success {
-    background-color: $secondary-color;
-  }
-
-  &.error {
-    background-color: $error-color;
-  }
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+  z-index: $z-index-tooltip;
 }
 
-@keyframes slideIn {
-  from {
-    transform: translateX(100%);
-    opacity: 0;
+.toast {
+  min-width: 300px;
+  padding: $spacing-md;
+  border-radius: $border-radius;
+  background-color: white;
+  box-shadow: $shadow-md;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  animation: slideIn 0.3s ease-out;
+
+  &--success {
+    border-left: 4px solid $success-color;
   }
-  to {
-    transform: translateX(0);
-    opacity: 1;
+
+  &--error {
+    border-left: 4px solid $error-color;
+  }
+
+  &--info {
+    border-left: 4px solid $primary-color;
+  }
+
+  p {
+    margin: 0;
+    padding-right: $spacing-md;
+  }
+
+  &__close {
+    background: none;
+    border: none;
+    font-size: $font-size-xl;
+    cursor: pointer;
+    color: $dark-blue;
+    opacity: 0.5;
+    transition: $transition-base;
+    padding: 0 $spacing-xs;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideIn {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideOut {
+    from {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    to {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+  }
+
+  &.removing {
+    animation: slideOut 0.3s ease-in forwards;
+  }
+
+  @include mobile {
+    min-width: auto;
+    width: calc(100vw - #{$spacing-lg * 2});
   }
 }

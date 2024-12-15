@@ -1,5 +1,4 @@
 import { Response } from 'express';
-import { ApiResponse } from '../types/api';
 
 export const sendResponse = <T>(
   res: Response, 
@@ -7,9 +6,8 @@ export const sendResponse = <T>(
   message: string = '', 
   status: number = 200
 ): void => {
-  const response: ApiResponse<T> = {
+  res.status(status).json({
     data,
     message
-  };
-  res.status(status).json(response);
+  });
 };

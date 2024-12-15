@@ -5,6 +5,8 @@
 @use './components/header' as *;
 @use './components/book' as *;
 @use './components/cart' as *;
+@use './components/cart-item';
 @use './components/auth-form' as *;
 @use './pages/add-book' as *;
 @use './pages/auth-page' as *;
+@use './pages/home';

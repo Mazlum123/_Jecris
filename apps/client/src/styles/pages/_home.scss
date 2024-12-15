@@ -1,0 +1,35 @@
+@use '../base/variables' as *;
+@use '../base/mixins' as *;
+
+.home {
+  padding: $spacing-lg;
+
+  h1 {
+    color: $primary-color;
+    margin-bottom: $spacing-xl;
+    text-align: center;
+  }
+
+  .books-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: $spacing-lg;
+    padding: $spacing-md;
+
+    @include mobile {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .loading {
+    text-align: center;
+    padding: $spacing-xl;
+    color: $primary-color;
+  }
+
+  .error {
+    text-align: center;
+    padding: $spacing-xl;
+    color: $error-color;
+  }
+}
