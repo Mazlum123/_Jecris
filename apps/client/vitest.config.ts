@@ -6,12 +6,8 @@ export default defineConfig({
   plugins: [react()],
   test: {
     environment: 'happy-dom',
-    setupFiles: './src/test/setup.ts',
     globals: true,
-    coverage: {
-      provider: 'v8',
-      reporter: ['text', 'json', 'html'],
-    },
+    setupFiles: './src/test/setup.ts'
   },
   resolve: {
     alias: {

@@ -1,4 +1,3 @@
-// apps/client/src/pages/Dashboard.tsx
 import { useAuthStore } from '../store/authStore';
 
 export const Dashboard = () => {

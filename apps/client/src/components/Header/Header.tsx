@@ -1,22 +1,23 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useCartStore } from '../../store/useCartStore';
 import { Cart } from '../Cart/Cart';
 
 export const Header = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const itemCount = useCartStore(state => state.items.length);
+  const navigate = useNavigate();
 
   return (
     <header className="header">
       <div className="logo">
-        <Link to="/">JeCris</Link>
+        <a onClick={() => navigate('/')} className="nav-link">JeCris</a>
       </div>
       <nav>
         <ul>
-          <li><Link to="/">Accueil</Link></li>
-          <li><Link to="/library">Ma bibliothèque</Link></li>
-          <li><Link to="/add-book">Ajouter un livre</Link></li>
+          <li><a onClick={() => navigate('/')} className="nav-link">Accueil</a></li>
+          <li><a onClick={() => navigate('/add-book')} className="nav-link">Ajouter un livre</a></li>
+          <li><a onClick={() => navigate('/library')} className="nav-link">Ma bibliothèque</a></li>
           <li>
             <button 
               className="cart-button"
@@ -27,7 +28,9 @@ export const Header = () => {
           </li>
         </ul>
       </nav>
-      <Cart isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
+      {isCartOpen && <Cart isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />}
     </header>
   );
 };
+
+export default Header;

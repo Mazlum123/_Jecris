@@ -3,10 +3,10 @@ import Home from '../pages/Home';
 import { AuthPage } from '../pages/AuthPage';
 import { Dashboard } from '../pages/Dashboard';
 import Layout from '../components/Layout/Layout';
-import { CheckoutSuccess } from '../pages/CheckoutSuccess';
 import { Library } from '../pages/Library';
-import PrivateRoute from '@/components/PrivateRoute/PrivateRoute';
+import { CheckoutSuccess } from '../pages/CheckoutSuccess';
 
+// Création du router
 const router = createBrowserRouter([
   {
     path: '/',
@@ -25,16 +25,12 @@ const router = createBrowserRouter([
         element: <Dashboard />
       },
       {
-        path: 'checkout/success',
-        element: <CheckoutSuccess />
+        path: 'library',
+        element: <Library />
       },
       {
-        path: 'library',
-        element: (
-          <PrivateRoute>
-            <Library />
-          </PrivateRoute>
-        )
+        path: 'checkout/success',
+        element: <CheckoutSuccess />
       }
     ]
   }

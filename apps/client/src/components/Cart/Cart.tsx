@@ -4,6 +4,7 @@ import { useCartStore } from '../../store/useCartStore';
 import { useNotificationStore } from '../../store/useNotificationStore';
 import { CartItem } from './CartItem';
 import { initiateCheckout } from '../../services/stripe.service';
+import { loadStripe } from '@stripe/stripe-js';
 
 interface CartProps {
   isOpen: boolean;
@@ -44,12 +45,62 @@ export const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
   };
 
   const handleCheckout = async () => {
+    const notification = useNotificationStore(state => state.addNotification);
+
+    if (items.length === 0) {
+      notification('Votre panier est vide', 'error');
+      return;
+    }
+
     try {
-      addNotification('Redirection vers le paiement...', 'info');
-      await initiateCheckout(items);
+      notification('Préparation de votre commande...', 'info');
+
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/checkout/create-session`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}` // Si vous utilisez des tokens
+        },
+        body: JSON.stringify({ 
+          items: items.map(item => ({
+            id: item.id,
+            title: item.title,
+            price: item.price,
+            quantity: item.quantity
+          }))
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Erreur lors de la création de la session de paiement');
+      }
+
+      const { data } = await response.json();
+
+      // Redirection vers Stripe
+      const stripe = await loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
+      if (!stripe) {
+        throw new Error('Erreur lors du chargement de Stripe');
+      }
+
+      notification('Redirection vers la page de paiement...', 'info');
+
+      const { error } = await stripe.redirectToCheckout({
+        sessionId: data.id
+      });
+
+      if (error) {
+        throw error;
+      }
+
     } catch (error) {
-      addNotification('Erreur lors du paiement', 'error');
-      console.error('Checkout error:', error);
+      console.error('Erreur checkout:', error);
+      notification(
+        error instanceof Error 
+          ? error.message 
+          : 'Une erreur est survenue lors du paiement', 
+        'error'
+      );
     }
   };
 
