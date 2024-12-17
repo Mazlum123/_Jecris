@@ -1,0 +1,56 @@
+{
+    "rewrites": [
+      {
+        "source": "/api/:path*",
+        "destination": "process.env.VITE_API_URL/:path*"
+      }
+    ],
+    "headers": [
+      {
+        "source": "/(.*)",
+        "headers": [
+          {
+            "key": "X-Content-Type-Options",
+            "value": "nosniff"
+          },
+          {
+            "key": "X-Frame-Options",
+            "value": "DENY"
+          },
+          {
+            "key": "X-XSS-Protection",
+            "value": "1; mode=block"
+          }
+        ]
+      }
+    ],
+    "builds": [
+      {
+        "src": "package.json",
+        "use": "@vercel/static-build",
+        "config": {
+          "distDir": "dist"
+        }
+      }
+    ],
+    "routes": [
+      {
+        "src": "/api/(.*)",
+        "dest": "process.env.VITE_API_URL/api/$1"
+      },
+      {
+        "src": "/assets/(.*)",
+        "headers": {
+          "cache-control": "public, max-age=31536000, immutable"
+        },
+        "continue": true
+      },
+      {
+        "src": "/(.*)",
+        "dest": "/index.html"
+      }
+    ],
+    "buildCommand": "cd ../.. && pnpm build:client",
+    "outputDirectory": "apps/client/dist",
+    "version": 2
+  }

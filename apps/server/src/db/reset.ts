@@ -18,6 +18,7 @@ async function reset() {
       DROP TABLE IF EXISTS cart_items CASCADE;
       DROP TABLE IF EXISTS carts CASCADE;
       DROP TABLE IF EXISTS books CASCADE;
+      DROP TABLE IF EXISTS purchases CASCADE;
       DROP TABLE IF EXISTS users CASCADE;
     `);
 

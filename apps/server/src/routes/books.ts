@@ -1,4 +1,12 @@
-import { Router } from 'express';
+// apps/server/src/routes/books.ts
+import { Router, Request, Response, NextFunction } from 'express';
+import { db } from '../db';
+import { books, purchases } from '../db/schema';
+import { eq, and } from 'drizzle-orm';
+import { authMiddleware } from '../middlewares/auth';
+import path from 'path';
+import fs from 'fs';
+import { generatePDF } from '../services/pdfService';
 import { 
   getAllBooks, 
   getBookById, 
@@ -6,14 +14,72 @@ import {
   updateBook, 
   deleteBook 
 } from '../controllers/books';
-import { authMiddleware } from '../middlewares/auth';
 
 const router = Router();
+
+// Interface personnalisée pour la requête avec user
+interface AuthenticatedRequest extends Request {
+  user?: {
+    userId: string;
+  };
+}
 
 router.get('/', getAllBooks);
 router.get('/:id', getBookById);
 router.post('/', authMiddleware, createBook);
 router.put('/:id', authMiddleware, updateBook);
 router.delete('/:id', authMiddleware, deleteBook);
+
+router.get('/:id/download', authMiddleware, async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const userId = req.user?.userId;
+    const bookId = req.params.id;
+
+    if (!userId) {
+      res.status(401).json({ error: 'Non autorisé' });
+      return;
+    }
+
+    const purchase = await db.query.purchases.findFirst({
+      where: and(
+        eq(purchases.userId, userId),
+        eq(purchases.bookId, bookId)
+      )
+    });
+
+    if (!purchase) {
+      res.status(403).json({ error: 'Vous n\'avez pas acheté ce livre' });
+      return;
+    }
+
+    const pdfPath = path.join(__dirname, '..', '..', purchase.pdfUrl);
+
+    if (!fs.existsSync(pdfPath)) {
+      const book = await db.query.books.findFirst({
+        where: eq(books.id, bookId)
+      });
+
+      if (!book) {
+        res.status(404).json({ error: 'Livre non trouvé' });
+        return;
+      }
+
+      const newPdfUrl = await generatePDF(userId, book);
+
+      await db.update(purchases)
+        .set({ pdfUrl: newPdfUrl })
+        .where(eq(purchases.id, purchase.id));
+    }
+
+    res.download(pdfPath);
+  } catch (error) {
+    console.error('Download error:', error);
+    next(error);
+  }
+});
 
 export default router;

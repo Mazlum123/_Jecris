@@ -6,6 +6,16 @@ $auth-primary: #D4D0C1;
 $auth-secondary: #BCBFD0;
 $auth-dark: #1E2A3B;
 
+.auth-message {
+  background-color: $primary-color;
+  color: $dark-blue;
+  padding: $spacing-md;
+  margin-bottom: $spacing-lg;
+  border-radius: $border-radius;
+  text-align: center;
+  font-weight: 500;
+}
+
 .login-form,
 .register-form {
   max-width: 400px;

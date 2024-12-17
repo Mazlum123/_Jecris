@@ -1,4 +1,7 @@
 import React from 'react';
+import { api } from '../../services/api';
+import { useNavigate } from 'react-router-dom';
+import { useNotificationStore } from '../../store/useNotificationStore';
 
 interface CartItemProps {
   id: string;
@@ -11,6 +14,7 @@ interface CartItemProps {
 }
 
 export const CartItem: React.FC<CartItemProps> = ({
+  id,
   title,
   price,
   quantity,
@@ -18,6 +22,27 @@ export const CartItem: React.FC<CartItemProps> = ({
   onUpdateQuantity,
   onRemove
 }) => {
+  const navigate = useNavigate();
+  const addNotification = useNotificationStore(state => state.addNotification);
+
+  const handlePurchase = async () => {
+    try {
+      console.log('Tentative d\'achat du livre:', { id, title });
+      const response = await api.post('/simulate-purchase', { bookId: id });
+      console.log('Réponse:', response.data);
+      
+      addNotification('Achat réussi !', 'success');
+      
+      // Attendre un peu avant la redirection
+      setTimeout(() => {
+        navigate('/library');
+      }, 1000);
+    } catch (error) {
+      console.error('Erreur d\'achat:', error);
+      addNotification('Erreur lors de l\'achat', 'error');
+    }
+  };
+
   return (
     <div className="cart-item">
       {imageUrl && (
@@ -52,6 +77,14 @@ export const CartItem: React.FC<CartItemProps> = ({
         <p className="cart-item__subtotal">
           Sous-total: {(price * quantity).toFixed(2)}€
         </p>
+
+        <button
+          className="cart-item__purchase"
+          onClick={handlePurchase}
+          aria-label="Acheter maintenant"
+        >
+          Acheter maintenant ({price.toFixed(2)}€)
+        </button>
       </div>
 
       <button
@@ -64,5 +97,33 @@ export const CartItem: React.FC<CartItemProps> = ({
     </div>
   );
 };
+
+/* Code Stripe commenté temporairement
+import { loadStripe } from '@stripe/stripe-js';
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
+
+const handleCheckout = async () => {
+  const stripe = await stripePromise;
+  if (!stripe) return;
+
+  const response = await api.post('/checkout/create-session', {
+    items: [{
+      id,
+      title,
+      price,
+      quantity,
+      imageUrl
+    }]
+  });
+
+  const { error } = await stripe.redirectToCheckout({
+    sessionId: response.data.id
+  });
+
+  if (error) {
+    console.error('Stripe error:', error);
+  }
+};
+*/
 
 export default CartItem;

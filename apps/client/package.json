@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "prebuild": "rimraf dist",
+    "build": "tsc && vite build || (echo 'Build failed' && exit 1)",
+    "postbuild": "echo 'Build completed' && node scripts/validateBuild.js",
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest run --coverage",

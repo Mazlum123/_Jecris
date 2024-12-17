@@ -3,12 +3,15 @@
   "version": "1.0.0",
   "type": "commonjs",
   "scripts": {
-    "dev": "ts-node-dev src/index.ts",
-    "build": "tsc",
-    "start": "node dist/index.js",
-    "generate": "drizzle-kit generate",
-    "migrate": "tsx src/db/migrate.ts",
-    "reset-db": "tsx src/db/reset.ts"
+  "dev": "ts-node-dev src/index.ts",
+  "build": "tsc",
+  "start": "node dist/index.js",
+  "generate": "drizzle-kit generate:pg",
+  "migrate": "node -r ts-node/register src/db/migrate.ts",
+  "migrate:prod": "node dist/db/migrate.js",
+  "prestart": "npm run migrate:prod",
+  "backup": "ts-node src/scripts/backup.ts",
+  "reset-db": "tsx src/db/reset.ts"
   },
   "dependencies": {
     "@types/pdfkit": "^0.13.7",

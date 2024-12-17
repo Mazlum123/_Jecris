@@ -1,5 +1,13 @@
 import { relations } from 'drizzle-orm';
-import { pgTable, text, timestamp, uuid, integer } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  text,
+  timestamp,
+  uuid,
+  integer as pgInteger,
+  boolean as pgBoolean
+} from 'drizzle-orm/pg-core';
+
 // Tables existantes
 export const users = pgTable('users', {
   id: uuid('id').defaultRandom().primaryKey(),
@@ -16,10 +24,11 @@ export const books = pgTable('books', {
   description: text('description').notNull(),
   price: text('price').notNull(),
   imageUrl: text('image_url'),
-  stock: integer('stock').notNull().default(0),
+  stock: pgInteger('stock').notNull().default(0),
   authorId: uuid('author_id').references(() => users.id),
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
+  content: text('content').notNull().default(''),
 });
 
 export const carts = pgTable('carts', {
@@ -33,7 +42,7 @@ export const cartItems = pgTable('cart_items', {
   id: uuid('id').defaultRandom().primaryKey(),
   cartId: uuid('cart_id').references(() => carts.id),
   bookId: uuid('book_id').references(() => books.id),
-  quantity: integer('quantity').notNull().default(1),
+  quantity: pgInteger('quantity').notNull().default(1),
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
 });
@@ -44,6 +53,8 @@ export const purchases = pgTable('purchases', {
   bookId: uuid('book_id').references(() => books.id),
   pdfUrl: text('pdf_url').notNull(),
   purchaseDate: timestamp('purchase_date').defaultNow(),
+  refunded: pgBoolean('refunded').default(false).notNull(),
+  refundDate: timestamp('refund_date')
 });
 
 // Relations
@@ -74,6 +85,17 @@ export const cartItemsRelations = relations(cartItems, ({ one }) => ({
   }),
   book: one(books, {
     fields: [cartItems.bookId],
+    references: [books.id],
+  }),
+}));
+
+export const purchasesRelations = relations(purchases, ({ one }) => ({
+  user: one(users, {
+    fields: [purchases.userId],
+    references: [users.id],
+  }),
+  book: one(books, {
+    fields: [purchases.bookId],
     references: [books.id],
   }),
 }));

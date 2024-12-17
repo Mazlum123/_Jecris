@@ -1,13 +1,21 @@
 {
   "name": "jecris",
+  "private": true,
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "dev:client": "cd apps/client && pnpm dev",
     "dev:server": "cd apps/server && pnpm dev",
-    "dev": "pnpm run --parallel dev:*"
+    "dev": "pnpm run --parallel dev:*",
+    "build": "pnpm run build:client && pnpm run build:server",
+    "build:client": "cd apps/client && pnpm build",
+    "build:server": "cd apps/server && pnpm build",
+    "start": "cd apps/server && pnpm start",
+    "test": "pnpm run --parallel test",
+    "lint": "pnpm run --parallel lint",
+    "clean": "pnpm run --parallel clean",
+    "prepare": "husky install"
   },
   "keywords": [],
   "author": "",
@@ -17,7 +25,9 @@
     "dotenv": "^16.4.7",
     "drizzle-orm": "^0.38.0",
     "express": "^4.21.2",
-    "pg": "^8.13.1"
+    "pg": "^8.13.1",
+    "husky": "^8.0.0",
+    "lint-staged": "^13.0.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
@@ -25,5 +35,13 @@
     "@types/node": "^22.10.1",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.7.2"
-  }
+  },
+  "lint-staged": {
+    "apps/**/*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "apps/**/*.{scss,css}": [
+      "prettier --write"
+    ]
 }

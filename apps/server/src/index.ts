@@ -1,12 +1,27 @@
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import path from 'path';
 import router from './routes';
+import https from 'https';
+import fs from 'fs';
 
 dotenv.config();
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+if (process.env.NODE_ENV === 'production') {
+  const privateKey = fs.readFileSync('/etc/ssl/private/private.key', 'utf8');
+  const certificate = fs.readFileSync('/etc/ssl/certs/certificate.crt', 'utf8');
+  const credentials = { key: privateKey, cert: certificate };
+
+  const httpsServer = https.createServer(credentials, app);
+  httpsServer.listen(443);
+} else {
+  app.listen(process.env.PORT || 3000);
+}
 
 app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:5173',

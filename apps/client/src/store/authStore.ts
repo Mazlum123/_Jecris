@@ -23,6 +23,8 @@ export const useAuthStore = create<AuthState>()(
       login: async (email: string, password: string) => {
         try {
           const response = await loginApi(email, password);
+          const { token, user } = response.data;
+          localStorage.setItem('token', token);
           set({
             user: response.data.user,
             token: response.data.token,
@@ -70,7 +72,7 @@ export const useAuthStore = create<AuthState>()(
       },
     }),
     {
-      name: 'auth-storage',
+      name: 'auth-storage'
     }
   )
 );

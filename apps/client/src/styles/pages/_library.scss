@@ -1,3 +1,6 @@
+@use '../base/variables' as *;
+@use '../base/mixins' as *;
+
 .library {
   padding: $spacing-xl;
   min-height: calc(100vh - 60px);
