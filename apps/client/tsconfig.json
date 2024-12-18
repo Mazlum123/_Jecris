@@ -12,19 +12,15 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "strict": true,
-    "baseUrl": ".",
+    "baseUrl": "./src",
     "paths": {
       "@/*": ["./src/*"]
     },
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
-    "types": [
-      "node",
-      "vitest/globals",
-      "@testing-library/jest-dom"
-    ]
+    "types": ["node", "vitest/globals", "@testing-library/jest-dom"]
   },
   "include": ["src", "**/*.ts", "**/*.tsx"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "references": [{ "path": "../server/tsconfig.json" }]
 }

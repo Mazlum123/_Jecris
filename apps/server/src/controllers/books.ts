@@ -1,150 +1,27 @@
 import { Request, Response } from 'express';
-import { db } from '../db';
-import { books } from '../db/schema';
-import { eq } from 'drizzle-orm';
-import { sendResponse } from '../utils/responses';
-import { z } from 'zod';
 
-const bookSchema = z.object({
-  title: z.string().min(1, 'Title is required'),
-  description: z.string().min(1, 'Description is required'),
-  price: z.number().positive('Price must be positive'),
-  imageUrl: z.string().url().optional(),
-  stock: z.number().int().min(0, 'Stock cannot be negative'),
-});
-
-// Récupérer tous les produits
-export const getAllBooks = async (_req: Request, res: Response): Promise<void> => {
-  try {
-    const booksList = await db.query.books.findMany({
-      orderBy: (books, { desc }) => [desc(books.createdAt)],
-    });
-
-    sendResponse(res, booksList, 'Books retrieved successfully', 200);
-  } catch (error) {
-    console.error('Get books error:', error);
-    sendResponse(res, null, 'Failed to retrieve books', 500);
-  }
+export const getAllBooks = (_req: Request, res: Response): void => {
+  res.json([
+    { id: 1, title: 'Book A', author: 'Author A' },
+    { id: 2, title: 'Book B', author: 'Author B' },
+    { id: 3, title: 'Book C', author: 'Author C' },
+  ]);
 };
 
-// Récupérer un livre par ID
-export const getBookById = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const { id } = req.params;
-
-    const book = await db.query.books.findFirst({
-      where: eq(books.id, id),
-    });
-
-    if (!book) {
-      sendResponse(res, null, 'Book not found', 404);
-      return;
-    }
-
-    sendResponse(res, book, 'Book retrieved successfully', 200);
-  } catch (error) {
-    console.error('Get book error:', error);
-    sendResponse(res, null, 'Failed to retrieve book', 500);
-  }
+export const getBookById = (req: Request, res: Response): void => {
+  const bookId = Number(req.params.id);
+  const book = { id: bookId, title: `Book ${bookId}`, author: `Author ${bookId}` };
+  res.json(book);
 };
 
-// Créer un nouveau livre
-export const createBook = async (req: Request, res: Response): Promise<void> => {
-    try {
-      const validatedData = bookSchema.parse(req.body);
-      const authorId = res.locals.user.userId;
-  
-      const [newBook] = await db.insert(books)
-        .values({
-          title: validatedData.title,
-          description: validatedData.description,
-          price: validatedData.price.toString(),
-          imageUrl: validatedData.imageUrl,
-          stock: validatedData.stock,
-          authorId
-        })
-        .returning();
-  
-      sendResponse(res, newBook, 'Book created successfully', 201);
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        sendResponse(res, null, error.errors[0].message, 400);
-        return;
-      }
-      console.error('Create book error:', error);
-      sendResponse(res, null, 'Failed to create book', 500);
-    }
-  };
-  
-// Mettre à jour un livre
-export const updateBook = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const { id } = req.params;
-    const validatedData = bookSchema.partial().parse(req.body);  // Utilisez `bookSchema` ici
-    const authorId = res.locals.user.userId;
-
-    const existingBook = await db.query.books.findFirst({
-      where: eq(books.id, id),
-    });
-
-    if (!existingBook) {
-      sendResponse(res, null, 'Book not found', 404);
-      return;
-    }
-
-    if (existingBook.authorId !== authorId) {
-      sendResponse(res, null, 'Unauthorized to update this book', 403);
-      return;
-    }
-
-    const updateData = {
-      ...validatedData,
-      price: validatedData.price?.toString(),
-      updatedAt: new Date(),
-    };
-
-    const [updatedBook] = await db.update(books)
-      .set(updateData)
-      .where(eq(books.id, id))
-      .returning();
-
-    sendResponse(res, updatedBook, 'Book updated successfully', 200);
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      sendResponse(res, null, error.errors[0].message, 400);
-      return;
-    }
-    console.error('Update book error:', error);
-    sendResponse(res, null, 'Failed to update book', 500);
-  }
+export const createBook = (req: Request, res: Response): void => {
+  res.status(201).json({ message: 'Book created', book: req.body });
 };
 
-// Supprimer un livre
-export const deleteBook = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const { id } = req.params;
-    const authorId = res.locals.user.userId;
+export const updateBook = (req: Request, res: Response): void => {
+  res.json({ message: `Book ${req.params.id} updated`, book: req.body });
+};
 
-    // Vérifier que l'utilisateur est bien l'auteur du livre
-    const existingBook = await db.query.books.findFirst({
-      where: eq(books.id, id),
-    });
-
-    if (!existingBook) {
-      sendResponse(res, null, 'Book not found', 404);
-      return;
-    }
-
-    if (existingBook.authorId !== authorId) {
-      sendResponse(res, null, 'Unauthorized to delete this book', 403);
-      return;
-    }
-
-    await db.delete(books).where(eq(books.id, id));
-
-    sendResponse(res, null, 'Book deleted successfully', 200);
-  } catch (error) {
-    console.error('Delete book error:', error);
-    sendResponse(res, null, 'Failed to delete book', 500);
-  }
+export const deleteBook = (req: Request, res: Response): void => {
+  res.json({ message: `Book ${req.params.id} deleted` });
 };

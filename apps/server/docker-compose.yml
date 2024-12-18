@@ -1,5 +1,8 @@
 version: '3.8'
 
+networks:
+  jecris_network:
+
 services:
   postgres:
     image: postgres:latest
@@ -12,6 +15,9 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ../../init/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - jecris_network
 
   pgadmin:
     image: dpage/pgadmin4
@@ -23,6 +29,8 @@ services:
       - "5050:80"
     depends_on:
       - postgres
+    networks:
+      - jecris_network
 
 volumes:
   postgres_data:

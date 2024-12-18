@@ -1,19 +1,9 @@
-import express from 'express';
-import cookieParser from 'cookie-parser';
-import cors from 'cors';
+import express, { Express } from 'express';
 import router from './routes';
 
-const app = express();
+const app: Express = express();
 
-// Middlewares
-app.use(cookieParser());
 app.use(express.json());
-app.use(cors({
-  origin: process.env.FRONTEND_URL,
-  credentials: true
-}));
-
-// Routes
 app.use('/api', router);
 
 export default app;

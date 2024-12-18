@@ -8,6 +8,13 @@
       "when": 1734063238730,
       "tag": "0000_special_killraven",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1734509523614,
+      "tag": "0001_pretty_spencer_smythe",
+      "breakpoints": true
     }
   ]
 }

@@ -1,16 +1,27 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
-import { Pool } from 'pg';
+import { Client } from 'pg';
 import * as schema from './schema';
-import dotenv from 'dotenv';
+import * as dotenv from 'dotenv';
 
 dotenv.config();
 
-if (!process.env.DATABASE_URL) {
-  throw new Error('DATABASE_URL is not defined');
-}
-
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+const client = new Client({
+  host: process.env.DB_HOST,
+  port: Number(process.env.DB_PORT),
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
 });
 
-export const db = drizzle(pool, { schema });
+export const connectDb = async () => {
+  await client.connect();
+  console.log('Database connected successfully');
+  return drizzle(client, { schema });
+};
+
+export let db: ReturnType<typeof connectDb> extends Promise<infer T> ? T : never;
+
+// Initialize db
+(async () => {
+  db = await connectDb();
+})();
