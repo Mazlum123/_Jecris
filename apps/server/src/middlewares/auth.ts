@@ -1,32 +1,36 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import { sendResponse } from '../utils/responses';
 
-export const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
+export interface AuthenticatedRequest extends Request {
+  user?: {
+    userId: string;
+  };
+}
+
+export const authMiddleware = (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
+  const token = req.headers.authorization?.split(' ')[1];
+
+  if (!token) {
+    res.status(401).json({ message: 'Token manquant' });
+    return;
+  }
+
   try {
-    const token = req.headers.authorization?.split(' ')[1];
-    
-    if (!token) {
-      return res.status(401).json({ message: 'Token manquant' });
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as {
+      userId: string;
+      exp: number;
+    };
+
+    // Vérifie l'expiration du token
+    if (Date.now() >= decoded.exp * 1000) {
+      res.status(401).json({ message: 'Token expiré' });
+      return;
     }
 
-    try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET!) as {
-        userId: string;
-        exp: number;
-      };
-
-      // Vérification de l'expiration
-      if (Date.now() >= decoded.exp * 1000) {
-        return res.status(401).json({ message: 'Token expiré' });
-      }
-
-      res.locals.user = decoded;
-      next();
-    } catch (error) {
-      return res.status(401).json({ message: 'Token invalide' });
-    }
+    req.user = { userId: decoded.userId }; // Associe userId à l'objet `req`
+    next();
   } catch (error) {
-    return res.status(500).json({ message: 'Erreur serveur' });
+    res.status(401).json({ message: 'Token invalide' });
+    return;
   }
 };

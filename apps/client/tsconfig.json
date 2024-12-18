@@ -25,6 +25,6 @@
       "@testing-library/jest-dom"
     ]
   },
-  "include": ["src", "**/*.ts", "**/*.tsx"],
+  "include": ["src", "**/*.ts", "**/*.tsx", "../server/src/routes/pdf.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

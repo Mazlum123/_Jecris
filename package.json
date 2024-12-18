@@ -44,4 +44,5 @@
     "apps/**/*.{scss,css}": [
       "prettier --write"
     ]
+  }
 }

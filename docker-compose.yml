@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:latest
+    container_name: jecris-db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: jecris
+    ports:
+      - "5432:5432"  # Mappe le port 5432 de Docker vers le port local 5432
+    volumes:
+      - pgdata:/var/lib/postgresql/data  # Persistant les données
+    networks:
+      - jecris-network
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: jecris-pgadmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "8080:80"  # Accès via http://localhost:8080
+    depends_on:
+      - db  # S'assure que le conteneur PostgreSQL démarre avant pgAdmin
+    networks:
+      - jecris-network
+
+volumes:
+  pgdata:  # Définit un volume pour sauvegarder les données
+
+networks:
+  jecris-network:  # Crée un réseau Docker spécifique pour ton projet
