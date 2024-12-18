@@ -2,34 +2,20 @@
 @use '../base/mixins' as *;
 
 .home {
-  padding: $spacing-lg;
-
+  padding: 20px;
   h1 {
-    color: $primary-color;
-    margin-bottom: $spacing-xl;
     text-align: center;
+    margin-bottom: 20px;
   }
-
   .books-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: $spacing-lg;
-    padding: $spacing-md;
-
-    @include mobile {
-      grid-template-columns: 1fr;
-    }
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+    justify-items: center;
   }
-
-  .loading {
+  .loading, .error {
     text-align: center;
-    padding: $spacing-xl;
-    color: $primary-color;
-  }
-
-  .error {
-    text-align: center;
-    padding: $spacing-xl;
-    color: $error-color;
+    margin-top: 20px;
+    font-size: 18px;
   }
 }

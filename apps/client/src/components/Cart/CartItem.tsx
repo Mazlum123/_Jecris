@@ -1,6 +1,6 @@
 import React from 'react';
 import { api } from '../../services/api';
-import { useNavigate } from 'react-router-dom';
+import { useCartStore } from '../../store/useCartStore';
 import { useNotificationStore } from '../../store/useNotificationStore';
 
 interface CartItemProps {
@@ -22,7 +22,6 @@ export const CartItem: React.FC<CartItemProps> = ({
   onUpdateQuantity,
   onRemove
 }) => {
-  const navigate = useNavigate();
   const addNotification = useNotificationStore(state => state.addNotification);
 
   const handlePurchase = async () => {
@@ -33,9 +32,8 @@ export const CartItem: React.FC<CartItemProps> = ({
       
       addNotification('Achat réussi !', 'success');
       
-      // Attendre un peu avant la redirection
       setTimeout(() => {
-        navigate('/library');
+        // Logique de redirection après achat
       }, 1000);
     } catch (error) {
       console.error('Erreur d\'achat:', error);
@@ -97,33 +95,3 @@ export const CartItem: React.FC<CartItemProps> = ({
     </div>
   );
 };
-
-/* Code Stripe commenté temporairement
-import { loadStripe } from '@stripe/stripe-js';
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
-
-const handleCheckout = async () => {
-  const stripe = await stripePromise;
-  if (!stripe) return;
-
-  const response = await api.post('/checkout/create-session', {
-    items: [{
-      id,
-      title,
-      price,
-      quantity,
-      imageUrl
-    }]
-  });
-
-  const { error } = await stripe.redirectToCheckout({
-    sessionId: response.data.id
-  });
-
-  if (error) {
-    console.error('Stripe error:', error);
-  }
-};
-*/
-
-export default CartItem;

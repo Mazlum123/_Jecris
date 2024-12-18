@@ -3,13 +3,13 @@ version: '3.8'
 services:
   postgres:
     image: postgres:latest
-    container_name: jecris_db
+    container_name: jecris
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: jecris
+      POSTGRES_DB: jecris-bdd
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
