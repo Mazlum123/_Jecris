@@ -17,7 +17,7 @@ export const authMiddleware = (req: AuthenticatedRequest, res: Response, next: N
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as {
-      userId: string;
+      userId: 'some-user-id',
       exp: number;
     };
 

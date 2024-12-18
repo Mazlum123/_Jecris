@@ -22,9 +22,18 @@
     "types": [
       "node",
       "vitest/globals",
-      "@testing-library/jest-dom"
+      "@testing-library/jest-dom",
+      "msw"
     ]
   },
-  "include": ["src", "**/*.ts", "**/*.tsx", "../server/src/routes/pdf.ts"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "references": [{ "path": "./tsconfig.node.json" }],
+"include": ["src/**/*.ts", "src/**/*.tsx", "src/tests/**/*.ts", "src/tests/**/*.tsx"],
+"exclude": [
+  "vite.config.ts",
+  "vitest.config.ts",
+  "src/test/**/*",
+  "src/tests/**/*",
+  "src/tests/mocks/**/*"
+]
+
 }

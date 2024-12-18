@@ -5,10 +5,10 @@ import {
   timestamp,
   uuid,
   integer as pgInteger,
-  boolean as pgBoolean
+  boolean as pgBoolean,
 } from 'drizzle-orm/pg-core';
 
-// Tables existantes
+// Table des utilisateurs
 export const users = pgTable('users', {
   id: uuid('id').defaultRandom().primaryKey(),
   name: text('name').notNull(),
@@ -18,6 +18,7 @@ export const users = pgTable('users', {
   updatedAt: timestamp('updated_at').defaultNow(),
 });
 
+// Table des livres
 export const books = pgTable('books', {
   id: uuid('id').defaultRandom().primaryKey(),
   title: text('title').notNull(),
@@ -31,6 +32,7 @@ export const books = pgTable('books', {
   content: text('content').notNull().default(''),
 });
 
+// Table des paniers
 export const carts = pgTable('carts', {
   id: uuid('id').defaultRandom().primaryKey(),
   userId: uuid('user_id').references(() => users.id),
@@ -38,6 +40,7 @@ export const carts = pgTable('carts', {
   updatedAt: timestamp('updated_at').defaultNow(),
 });
 
+// Table des articles dans les paniers
 export const cartItems = pgTable('cart_items', {
   id: uuid('id').defaultRandom().primaryKey(),
   cartId: uuid('cart_id').references(() => carts.id),
@@ -47,17 +50,18 @@ export const cartItems = pgTable('cart_items', {
   updatedAt: timestamp('updated_at').defaultNow(),
 });
 
+// Table des achats
 export const purchases = pgTable('purchases', {
   id: uuid('id').defaultRandom().primaryKey(),
   userId: uuid('user_id').references(() => users.id),
   bookId: uuid('book_id').references(() => books.id),
   pdfUrl: text('pdf_url').notNull(),
-  purchaseDate: timestamp('purchase_date').defaultNow(),
+  purchaseDate: timestamp('purchase_date').defaultNow(), 
   refunded: pgBoolean('refunded').default(false).notNull(),
-  refundDate: timestamp('refund_date')
+  refundDate: timestamp('refund_date'),
 });
 
-// Relations
+// Relations entre les tables
 export const usersRelations = relations(users, ({ many }) => ({
   books: many(books),
   carts: many(carts),
@@ -100,7 +104,7 @@ export const purchasesRelations = relations(purchases, ({ one }) => ({
   }),
 }));
 
-// Types
+// Types générés pour les tables
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 export type Book = typeof books.$inferSelect;
@@ -109,3 +113,5 @@ export type Cart = typeof carts.$inferSelect;
 export type NewCart = typeof carts.$inferInsert;
 export type CartItem = typeof cartItems.$inferSelect;
 export type NewCartItem = typeof cartItems.$inferInsert;
+export type Purchase = typeof purchases.$inferSelect;
+export type NewPurchase = typeof purchases.$inferInsert;

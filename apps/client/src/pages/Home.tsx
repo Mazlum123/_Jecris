@@ -1,27 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import { BookCard } from '../components/Book/BookCard';
-import { api } from '../services/api';
-
-interface Book {
-  id: string;
-  title: string;
-  description: string;
-  price: string;
-  imageUrl?: string;
-}
 
 const Home = () => {
-  const [books, setBooks] = useState<Book[]>([]);
+  const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchBooks = async () => {
-      try {const response = await api.get('/books');
-        setBooks(response.data.data);
-      } catch (err) {
-        setError('Erreur lors du chargement des livres');
-        console.error(err);
+      try {
+        const response = await fetch('http://localhost:4000/api/books');
+        if (!response.ok) throw new Error('Erreur lors de la récupération des livres');
+        const data = await response.json();
+        setBooks(data);
+      } catch (error) {
+        console.error(error);
       } finally {
         setLoading(false);
       }
@@ -30,24 +21,16 @@ const Home = () => {
     fetchBooks();
   }, []);
 
-  if (loading) return <div className="loading">Chargement...</div>;
-  if (error) return <div className="error">{error}</div>;
+  if (loading) return <div>Chargement...</div>;
 
   return (
-    <div className="home">
+    <div>
       <h1>Catalogue de livres</h1>
-      <div className="books-grid">
+      <ul>
         {books.map((book) => (
-          <BookCard
-            key={book.id}
-            id={book.id}
-            title={book.title}
-            description={book.description}
-            price={Number(book.price)}
-            imageUrl={book.imageUrl}
-          />
+          <li key={book.id}>{book.title}</li>
         ))}
-      </div>
+      </ul>
     </div>
   );
 };

@@ -2,7 +2,12 @@ import { useCartStore } from '../../store/useCartStore';
 import { useNotificationStore } from '../../store/useNotificationStore';
 import { initiateCheckout } from '../../services/stripe.service';
 
-const Cart = () => {
+interface CartProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
   const { items, total } = useCartStore();
   const addNotification = useNotificationStore(state => state.addNotification);
 
@@ -16,8 +21,15 @@ const Cart = () => {
     }
   };
 
+  if (!isOpen) {
+    return null;
+  }
+
   return (
     <div className="cart">
+      <button className="cart__close" onClick={onClose}>
+        Fermer
+      </button>
       <div className="cart__total">
         Total: {total.toFixed(2)}€
       </div>

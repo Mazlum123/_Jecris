@@ -9,5 +9,5 @@
     },
     "typeRoots": ["node_modules/@types", "./types"]
   },
-  "include": ["src", "drizzle.config.ts"]
+  "include": ["src/**/*", "drizzle.config.ts"]
 }

@@ -1,4 +1,4 @@
-import { server } from './mocks/server';
+import { server } from './tests/mocks/server';
 
 beforeAll(() => {
   // Désactiver les appels réseau réels en prod

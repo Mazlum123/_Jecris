@@ -1,12 +1,8 @@
 {
-    "extends": "./tsconfig.json",
-    "compilerOptions": {
-      "sourceMap": false,
-      "removeComments": true
-    },
-    "exclude": [
-      "src/**/*.test.ts",
-      "src/**/*.test.tsx",
-      "src/tests/**/*"
-    ]
-  }
+  "extends": "./tsconfig.json",
+  "exclude": [
+    "src/**/*.test.ts",
+    "src/**/*.test.tsx",
+    "src/tests/**/*"
+  ]
+}

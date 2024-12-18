@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCartStore } from '../../store/useCartStore';
 import { useAuthStore } from '../../store/authStore';
-import { Cart } from '../Cart/Cart';
+import Cart from '../Cart/Cart';
 
 export const Header = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);

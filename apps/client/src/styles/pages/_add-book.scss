@@ -18,7 +18,7 @@
     .error-message {
       padding: $spacing-md;
       margin-bottom: $spacing-md;
-      background-color: lighten($error-color, 45%);
+      background-color: grey;
       border: 1px solid $error-color;
       border-radius: $border-radius;
       color: $error-color;
@@ -37,7 +37,7 @@
       input, textarea {
         width: 100%;
         padding: $spacing-sm;
-        border: 1px solid darken($background-color, 10%);
+        border: 1px solid black;
         border-radius: $border-radius;
         font-size: $font-size-base;
         transition: $transition-base;
@@ -49,7 +49,7 @@
         }
 
         &:disabled {
-          background-color: darken($background-color, 5%);
+          background-color: grey;
           cursor: not-allowed;
         }
       }
@@ -82,7 +82,7 @@
           color: white;
 
           &:hover:not(:disabled) {
-            background-color: darken($primary-color, 10%);
+            border: 1px solid grey;
           }
         }
 
@@ -91,7 +91,7 @@
           color: $text-color;
 
           &:hover:not(:disabled) {
-            background-color: darken($background-color, 10%);
+            border: 1px solid grey;
           }
         }
       }
